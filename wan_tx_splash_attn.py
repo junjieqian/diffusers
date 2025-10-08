@@ -687,19 +687,18 @@ def main():
   key = jax.random.key(0)
   rngs = nnx.Rngs(key)
   
-  # Create JAX VAE with default parameters
-  wan_vae = AutoencoderKLWan(
-      rngs=rngs,
-      base_dim=96,
-      z_dim=16,
-      dim_mult=[1, 2, 4, 4],
-      num_res_blocks=2,
-      attn_scales=[],
-      temperal_downsample=[False, True, True],
-      mesh=mesh
-  )
-  
   with mesh:
+    # Create JAX VAE with default parameters
+    wan_vae = AutoencoderKLWan(
+        rngs=rngs,
+        base_dim=96,
+        z_dim=16,
+        dim_mult=[1, 2, 4, 4],
+        num_res_blocks=2,
+        attn_scales=[],
+        temperal_downsample=[False, True, True],
+        mesh=mesh
+    )
     # Create VAE cache
     vae_cache = AutoencoderKLWanCache(wan_vae)
     
