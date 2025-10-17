@@ -1,4 +1,5 @@
 import functools
+import os
 import re
 import math
 import torch
@@ -899,13 +900,14 @@ def main():
     if args.profile:
       # profile set fewer step and output latent to skip VAE for now
       # output_type='latent' will skip VAE
-      jax.profiler.start_trace(PROFILE_OUT_PATH)
+      os.makedirs(args.profile_out_path, exist_ok=True)
+      jax.profiler.start_trace(args.profile_out_path)
       output = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
         height=args.height,
         width=args.width,
-        num_inference_steps=3,
+        num_inference_steps=int(args.num_inference_steps),
         num_frames=args.frames,
         guidance_scale=5.0,
         output_type="latent",
@@ -946,6 +948,7 @@ def parse_args():
     parser.add_argument("--profile", action="store_true", default=False, help="Add profiler")
     parser.add_argument("--use_fsdp", type=bool, default=USE_FSDP, help="Use FSDP")
     parser.add_argument("--use_k_smooth", type=bool, default=USE_K_SMOOTH, help="Use K smooth")
+    parser.add_argument("--profile_out_path", type=str, default=PROFILE_OUT_PATH, help="Profile out path")
     return parser.parse_args()
 
 if __name__ == '__main__':
