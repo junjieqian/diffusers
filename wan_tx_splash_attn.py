@@ -77,7 +77,7 @@ BKVCOMPUTESIZE = 1024
 # Set to None to use the original full Causal Attention.
 WINDOW_SIZE = None
 
-PROFILE_OUT_PATH = "/dev/shm/tensorboard"
+PROFILE_OUT_PATH = "trace_dir"
 
 USE_DP = True
 SP_NUM = 1
@@ -902,18 +902,9 @@ def main():
       # output_type='latent' will skip VAE
       os.makedirs(args.profile_out_path, exist_ok=True)
       jax.profiler.start_trace(args.profile_out_path)
-      output = pipe(
-        prompt=prompt,
-        negative_prompt=negative_prompt,
-        height=args.height,
-        width=args.width,
-        num_inference_steps=int(args.num_inference_steps),
-        num_frames=args.frames,
-        guidance_scale=5.0,
-        output_type="latent",
-        generator=generator,
-        use_dp=args.use_dp,
-      )
+      perf_pipe_kwargs = pipe_kwargs.copy()
+      perf_pipe_kwargs['num_inference_steps'] = 3
+      output = pipe(**pipe_kwargs)
       jax.effects_barrier()
       jax.profiler.stop_trace()
       print("profile done")
